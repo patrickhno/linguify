@@ -13,12 +13,11 @@ require 'rake'
 
 require 'jeweler'
 Jeweler::Tasks.new do |gem|
-  # gem is a Gem::Specification... see http://docs.rubygems.org/read/chapter/20 for more options
   gem.name = "goling"
   gem.homepage = "http://github.com/patrickhno/goling"
   gem.license = "MIT"
-  gem.summary = %Q{TODO: one-line summary of your gem}
-  gem.description = %Q{TODO: longer description of your gem}
+  gem.summary = %Q{Goling, the linguistic compiler.}
+  gem.description = %Q{Goling is a linguistic compiler allowing you to compile and execute plain english.}
   gem.email = "patrick.hanevold@gmail.com"
   gem.authors = ["Patrick Hanevold"]
   # dependencies defined in Gemfile
