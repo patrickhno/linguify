@@ -42,23 +42,23 @@ Since the code ends up compiled like all code should be you can execute your cod
 
 	puts "view all files inside all directories recursively".linguify.to_ruby
     # => code = lambda do
-		   directories_0 = Dir.entries(".").select { |f| ((not (f[0] == ".")) and File.directory?(f)) }
-		   directories_1 = (all_dirs = dirs
-		   Find.find(dirs) do |path|
-		     if FileTest.directory?(path) then
-		       if (File.basename(path)[0] == ".") then
-		         Find.prune
-		       else
-		         (all_dirs << path)
-		         next
-		       end
-		     end
-		   end
-		   all_dirs)
-		   files_2 = dirs.map { |f| File.new(f, "r") }
-		   files.each { |file| pp(file) }
-		 end
-		 Goling::Linguified.trampoline(code)
+	#	   directories_0 = Dir.entries(".").select { |f| ((not (f[0] == ".")) and File.directory?(f)) }
+	#	   directories_1 = (all_dirs = dirs
+	#	   Find.find(dirs) do |path|
+	#	     if FileTest.directory?(path) then
+	#	       if (File.basename(path)[0] == ".") then
+	#	         Find.prune
+	#	       else
+	#	         (all_dirs << path)
+	#	         next
+	#	       end
+	#	     end
+	#	   end
+	#	   all_dirs)
+	#	   files_2 = dirs.map { |f| File.new(f, "r") }
+	#	   files.each { |file| pp(file) }
+	#	 end
+	#	 Goling::Linguified.trampoline(code)
 	
 And if you simply want to execute your magnificent piece of art:
 
