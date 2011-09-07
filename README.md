@@ -40,7 +40,7 @@ Since the code ends up compiled like all code should be you can execute your cod
 	  end
 	end
 
-	puts "view all files inside all directories recursively".linguify.to_ruby
+	"view all files inside all directories recursively".linguify.to_ruby
     # => code = lambda do
 	#	   directories_0 = Dir.entries(".").select { |f| ((not (f[0] == ".")) and File.directory?(f)) }
 	#	   directories_1 = (all_dirs = dirs
