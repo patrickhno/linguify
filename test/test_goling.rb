@@ -22,7 +22,7 @@ class TestGoling < Test::Unit::TestCase
       all_dirs
     end
 
-    reduce /every largest file inside ({directories:[^}]*})/ => 'files' do |dirs|
+    reduce /all files inside ({directories:[^}]*})/ => 'files' do |dirs|
       dirs.map{ |f| File.new(f, "r") }
     end
 
@@ -32,6 +32,6 @@ class TestGoling < Test::Unit::TestCase
       end
     end
 
-    "view every largest file inside all directories recursively".linguify.to_ruby.size > 0
+    "view all files inside all directories recursively".linguify.to_ruby.size > 0
   end
 end

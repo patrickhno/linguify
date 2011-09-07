@@ -3,7 +3,7 @@
 Goling is a linguistic compiler allowing you to compile and execute plain english.
 And thus allows you to program in plain english provided you have the reduction rules needed.
 
-Since it compiled like all code should be you can execute your code so amazingly fast I am in awe just to be able to write this divine text to you about it.
+Since the code ends up compiled like all code should be you can execute your code so amazingly fast I am in awe just to be able to write this divine text to you about it.
 
 ## Installation
 
@@ -30,7 +30,7 @@ Since it compiled like all code should be you can execute your code so amazingly
 	  all_dirs
 	end
 
-	reduce /every largest file inside ({directories:[^}]*})/ => 'files' do |dirs|
+	reduce /all files inside ({directories:[^}]*})/ => 'files' do |dirs|
 	  dirs.map{ |f| File.new(f, "r") }
 	end
 
@@ -40,7 +40,7 @@ Since it compiled like all code should be you can execute your code so amazingly
 	  end
 	end
 
-	puts "view every largest file inside all directories recursively".linguify.to_ruby
+	puts "view all files inside all directories recursively".linguify.to_ruby
     # => code = lambda do
 		   directories_0 = Dir.entries(".").select { |f| ((not (f[0] == ".")) and File.directory?(f)) }
 		   directories_1 = (all_dirs = dirs
@@ -62,7 +62,7 @@ Since it compiled like all code should be you can execute your code so amazingly
 	
 And if you simply want to execute your magnificent piece of art:
 
-	"view every largest file inside all directories recursively".linguify.run
+	"view all files inside all directories recursively".linguify.run
 
 Or even:
 
