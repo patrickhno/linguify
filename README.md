@@ -67,7 +67,7 @@ And if you simply want to execute your magnificent piece of art:
 Or even:
 
     # compile once, run plenty
-    code = "view every largest file inside all directories recursively".linguify
+    code = "view all files inside all directories recursively".linguify
     loop do
       code.run
     end
