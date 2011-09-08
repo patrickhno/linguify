@@ -130,26 +130,16 @@ module Goling
     def replace_variable_references(code,replacement,needle)
       case code[0]
       when :lasgn
-        if code[1] == needle
-          code[1]=replacement
-        end
-        code[2..-1].each do |h|
-          replace_variable_references(h,replacement,needle)
-        end
-      when :call
-        replace_variable_references(code[1],replacement,needle) if code[1]
-        if code[2] == needle
-          code[2]=replacement
-        end
-        replace_variable_references(code[3],replacement,needle)
+        code[1]=replacement if code[1] == needle
       when :lvar
-        if code[1] == needle
-          code[1]=replacement
-        end
-      else
-        code[1..-1].each do |h|
-          replace_variable_references(h,replacement,needle) if h.kind_of(Sexp)
-        end
+        code[1]=replacement if code[1] == needle
+      when :call
+        code[2]=replacement if code[2] == needle
+      when :lvar
+        code[1]=replacement if code[1] == needle
+      end
+      code[1..-1].each do |h|
+        replace_variable_references(h,replacement,needle) if h && h.kind_of?(Sexp)
       end
     end
 
