@@ -124,6 +124,36 @@ Luckily Goling has evolved to embrace such minds. Goling is not for the general 
 	#     end
 	#    "
 
+And you can even inline sub-expressions:
+
+    require 'goling'
+
+	reduce /sub expression/ => {:to => 'sub_expression', :lang => :ruby, :inline => true} do
+	  pp "this is the sub expression code"
+	end
+
+	reduce /({sub_expression:[^}]*}) of inlined code/ => {:to => 'code', :lang => :ruby, :inline => true} do |sub|
+	  something.each do |foobar| # life is not worth living without psedo foobars
+	    pp foobar
+	  end
+	end
+
+	reduce /execute ({code:[^}]*})/ => '' do |code|
+	  pp "hey mum"
+	  code
+	  code[:sub]
+	  pp "you will never know what I just did"
+	end
+
+	"execute sub expression of inlined code".linguify.to_ruby
+	# => "code = lambda do
+	#       (pp(\"hey mum\")
+	#       (something.each { |foobar| pp(foobar) })
+	#       pp(\"this is the sub expression code\")
+	#       pp(\"you will never know what I just did\"))
+	#     end
+	#    "
+
 ## License
 
 (The MIT License)
