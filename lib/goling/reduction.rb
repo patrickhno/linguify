@@ -104,7 +104,7 @@ module Goling
             raise "trying to reference #{red.lang} code in #{lang} code" if red.lang != lang
             if red.inline
               code = red.compile_with_return_to_var(nil,replace)
-              replace[args[i]] = Replacement.new(:sexp => Sexp.new(:block,*code), :inline => true, :rule => rule)
+              replace[args[i]] = Replacement.new(:sexp => Sexp.new(:block,*code), :inline => true)
             else
               code = red.compile_with_return_to_var("#{ret}_#{n}".to_sym,replace)
               args_code += code
