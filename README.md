@@ -77,74 +77,74 @@ Or even:
 Goling supports mixing javascript and ruby.
 A typical case would be to express NOSQL queries in plain English for everyones convenience.
 
-  reduce /a possible javascript NOSQL query/ => {:to => 'query', :lang => :js} do
-    @db.forEach(lambda{ |record|
-        emit(record);
-      }
-    )
-  end
+    reduce /a possible javascript NOSQL query/ => {:to => 'query', :lang => :js} do
+      @db.forEach(lambda{ |record|
+          emit(record);
+        }
+      )
+    end
 
-  reduce /execute ({query:[^}]*})/ => '' do |query|
-    db.map query
-  end
+    reduce /execute ({query:[^}]*})/ => '' do |query|
+      db.map query
+    end
 
-  "execute a possible javascript NOSQL query".linguify.to_ruby
-  # => "code = lambda do
-  #       query = \"function(){\\n  this.db.forEach(function(record){\\n    emit(record)\\n  });\\n}\"
-  #       db.map(query)
-  #     end
-  #    "
+    "execute a possible javascript NOSQL query".linguify.to_ruby
+    # => "code = lambda do
+    #       query = \"function(){\\n  this.db.forEach(function(record){\\n    emit(record)\\n  });\\n}\"
+    #       db.map(query)
+    #     end
+    #    "
 
 The nature of Golings expression reduction face pragmatic programmers with a urge to inline the code the arguments represents.
 Luckily Goling has evolved to embrace such minds. Goling is not for the general masses. It is for the mighty few pragmatics.
 
-  reduce /inlined code/ => {:to => 'code', :lang => :ruby, :inline => true} do
-    something.each do |foobar| # life is not worth living without psedo foobars
-      pp foobar
+    reduce /inlined code/ => {:to => 'code', :lang => :ruby, :inline => true} do
+      something.each do |foobar| # life is not worth living without psedo foobars
+        pp foobar
+      end
     end
-  end
 
-  reduce /execute ({code:[^}]*})/ => '' do |code|
-    pp "hey mum"
-    code
-    pp "you will never know what I just did"
-  end
+    reduce /execute ({code:[^}]*})/ => '' do |code|
+      pp "hey mum"
+      code
+      pp "you will never know what I just did"
+	end
 
-  "execute inlined code".linguify.to_ruby
-  # => "code = lambda do
-  #       (pp(\"hey mum\")
-  #       (something.each { |foobar| pp(foobar) })
-  #       pp(\"you will never know what I just did\"))
-  #     end
-  #    "
+	"execute inlined code".linguify.to_ruby
+	# => "code = lambda do
+	#       (pp(\"hey mum\")
+	#       (something.each { |foobar| pp(foobar) })
+	#       pp(\"you will never know what I just did\"))
+	#     end
+	#    "
 
 And you can even inline sub-expressions:
 
-reduce /sub expression/ => 'sub_expression' do
-  pp "this is the sub expression code"
-end
+	reduce /sub expression/ => 'sub_expression' do
+	  pp "this is the sub expression code"
+	end
 
-reduce /({sub_expression:[^}]*}) of inlined code/ => {:to => 'code', :lang => :ruby, :inline => true} do |sub|
-  something.each do |foobar| # life is not worth living without psedo foobars
-    pp foobar
-  end
-end
+	reduce /({sub_expression:[^}]*}) of inlined code/ => {:to => 'code', :lang => :ruby, :inline => true} do |sub|
+	  something.each do |foobar| # life is not worth living without psedo foobars
+	    pp foobar
+	  end
+	end
 
-reduce /execute ({code:[^}]*})/ => '' do |code|
-  pp "hey mum"
-  code
-  code[:sub]
-  pp "you will never know what I just did"
-end
+	reduce /execute ({code:[^}]*})/ => '' do |code|
+	  pp "hey mum"
+	  code
+	  code[:sub]
+	  pp "you will never know what I just did"
+	end
 
-"execute sub expression of inlined code".linguify.to_ruby
-# => "code = lambda do
-#       (pp(\"hey mum\")
-#       (sub_expression_0 = pp(\"this is the sub expression code\"))
-#       pp(\"this is the sub expression code\")
-#       pp(\"you will never know what I just did\"))
-#     end
-#    "
+	"execute sub expression of inlined code".linguify.to_ruby
+	# => "code = lambda do
+	#       (pp(\"hey mum\")
+	#       (sub_expression_0 = pp(\"this is the sub expression code\"))
+	#       pp(\"this is the sub expression code\")
+	#       pp(\"you will never know what I just did\"))
+	#     end
+	#    "
 
 ## License
 
