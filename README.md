@@ -11,6 +11,8 @@ Since the code ends up compiled like all code should be you can execute your cod
 
 ## Basic usage
 
+    require 'goling'
+
 	reduce /all directories/ => 'directories' do
 	  Dir.entries('.').select{ |f| f[0] != '.' && File.directory?(f) }
 	end
@@ -77,6 +79,8 @@ Or even:
 Goling supports mixing javascript and ruby.
 A typical case would be to express NOSQL queries in plain English for everyones convenience.
 
+    require 'goling'
+
     reduce /a possible javascript NOSQL query/ => {:to => 'query', :lang => :js} do
       @db.forEach(lambda{ |record|
           emit(record);
@@ -97,6 +101,8 @@ A typical case would be to express NOSQL queries in plain English for everyones 
 
 The nature of Golings expression reduction face pragmatic programmers with a urge to inline the code the arguments represents.
 Luckily Goling has evolved to embrace such minds. Goling is not for the general masses. It is for the mighty few pragmatics.
+
+    require 'goling'
 
     reduce /inlined code/ => {:to => 'code', :lang => :ruby, :inline => true} do
       something.each do |foobar| # life is not worth living without psedo foobars
@@ -119,6 +125,8 @@ Luckily Goling has evolved to embrace such minds. Goling is not for the general 
 	#    "
 
 And you can even inline sub-expressions:
+
+    require 'goling'
 
 	reduce /sub expression/ => 'sub_expression' do
 	  pp "this is the sub expression code"
