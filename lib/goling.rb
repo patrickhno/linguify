@@ -23,7 +23,7 @@ end
 
 class String
   def linguify bind=binding
-    return Goling::Linguified::cace[self] if Goling::Linguified::cache[self]
+    return Goling::Linguified::cache[self] if Goling::Linguified::cache[self]
     Goling::Linguified::cache[self] = Goling::Linguified.new(self,bind)
   end
 end

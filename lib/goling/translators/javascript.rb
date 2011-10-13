@@ -62,7 +62,11 @@ class Ruby2Js < SexpProcessor
 
     code = []
     if head_controlled then
-      code << "#{name}(#{cond}){"
+      if name == 'until'
+        code << "while(!#{cond}){"
+      else
+        code << "#{name}(#{cond}){"
+      end
       code << body if body
       code << "}"
     else
@@ -74,7 +78,7 @@ class Ruby2Js < SexpProcessor
   end
 
   def process_and(exp)
-    parenthesize "#{process exp.shift} and #{process exp.shift}"
+    parenthesize "#{process exp.shift} && #{process exp.shift}"
   end
 
   def process_arglist(exp) # custom made node
@@ -166,7 +170,6 @@ class Ruby2Js < SexpProcessor
   end
 
   def process_call(exp)
-str = exp.inspect
     receiver_node_type = exp.first.nil? ? nil : exp.first.first
     receiver = process exp.shift
     receiver = "(#{receiver})" if ASSIGN_NODES.include? receiver_node_type
@@ -200,7 +203,7 @@ str = exp.inspect
         args << arg
       end
     end
-#str+
+
     case name
     when *BINARY then
       "(#{receiver} #{name} #{args.join(', ')})"
@@ -229,6 +232,9 @@ str = exp.inspect
       receiver = "#{receiver}."        if receiver
 
       "#{receiver}function"
+    when :this # this.something
+      receiver = "#{receiver}."      if receiver
+      "#{receiver}#{name}"
     else
       args     = nil                 if args.empty?
       args     = "#{args.join(',')}" if args
@@ -311,7 +317,7 @@ str = exp.inspect
       lhs.to_s
     else
       if lhs.to_s[0] == '@'
-        "self.#{lhs.to_s[1..-1]} = #{process exp.shift}"
+        "this.#{lhs.to_s[1..-1]} = #{process exp.shift}"
       else
         "#{lhs} = #{process exp.shift}"
       end
@@ -321,7 +327,7 @@ str = exp.inspect
   def process_if(exp)
     expand = Ruby2Ruby::ASSIGN_NODES.include? exp.first.first
     c = process exp.shift
-    t_type = exp.first.sexp_type
+    t_type = exp.first.sexp_type if exp.first
     t = process exp.shift
     f_type = exp.first.sexp_type if exp.first
     f = process exp.shift
@@ -349,10 +355,10 @@ str = exp.inspect
         r = "#{f} unless #{c}"
         return r if (@indent+r).size < LINE_LENGTH and r !~ /\n/
       end
-      "unless #{c} then\n#{indent(f)}\nend"
+      "if(!#{c}){\n#{indent(f)}\n}"
     else
       # empty if statement, just do it in case of side effects from condition
-      "if #{c} then\n#{indent '# do nothing'}\nend"
+      "if #{c}{\n#{indent '// do nothing'}\n}"
     end
   end
 
