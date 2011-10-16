@@ -16,7 +16,7 @@ describe Goling::Linguified, "#linguify" do
           if File.basename(path)[0] == '.'
             Find.prune       # Don't look any further into this directory.
           else
-    		    all_dirs << path
+            all_dirs << path
             next
           end
         end
@@ -53,24 +53,24 @@ describe Goling::Linguified, "#linguify" do
   end
 
   it "should inline sub-expressions" do
-  	reduce /sub expression/ => {:to => 'sub_expression', :lang => :ruby, :inline => true} do
-  	  pp "this is the sub expression code"
-  	end
+    reduce /sub expression/ => {:to => 'sub_expression', :lang => :ruby, :inline => true} do
+      pp "this is the sub expression code"
+    end
 
-  	reduce /({sub_expression:[^}]*}) of inlined code/ => {:to => 'code', :lang => :ruby, :inline => true} do |sub|
-  	  something.each do |foobar|
-  	    pp foobar
-  	  end
-  	end
+    reduce /({sub_expression:[^}]*}) of inlined code/ => {:to => 'code', :lang => :ruby, :inline => true} do |sub|
+      something.each do |foobar|
+        pp foobar
+      end
+    end
 
-  	reduce /execute ({code:[^}]*})/ => '' do |code|
-  	  pp "hey mum"
-  	  code
-  	  code[:sub]
-  	  pp "you will never know what I just did"
-  	end
+    reduce /execute ({code:[^}]*})/ => '' do |code|
+      pp "hey mum"
+      code
+      code[:sub]
+      pp "you will never know what I just did"
+    end
 
-  	"execute sub expression of inlined code".linguify.to_ruby.should == "code = lambda do\n  (pp(\"hey mum\")\n  (something.each { |foobar| pp(foobar) })\n  pp(\"this is the sub expression code\")\n  pp(\"you will never know what I just did\"))\nend\n"
+    "execute sub expression of inlined code".linguify.to_ruby.should == "code = lambda do\n  (pp(\"hey mum\")\n  (something.each { |foobar| pp(foobar) })\n  pp(\"this is the sub expression code\")\n  pp(\"you will never know what I just did\"))\nend\n"
   end
 
 end
