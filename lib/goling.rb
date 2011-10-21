@@ -1,7 +1,9 @@
-# encoding: utf-8
 
 require 'goling/linguified'
 require 'goling/reduction'
+require 'goling/sexp'
+require 'goling/string'
+require 'goling/proc'
 
 def reduce(regexp,&code)
   Goling::rules << {
@@ -21,9 +23,4 @@ module Goling
 
 end
 
-class String
-  def linguify bind=binding
-    return Goling::Linguified::cache[self] if Goling::Linguified::cache[self]
-    Goling::Linguified::cache[self] = Goling::Linguified.new(self,bind)
-  end
-end
+

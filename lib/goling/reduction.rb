@@ -1,4 +1,3 @@
-# encoding: utf-8
 
 module Goling
   
@@ -38,7 +37,7 @@ module Goling
 
     def determine_arguments
       s = Marshal.load(Marshal.dump(self)) # sexp handling is not clean cut
-      raise "what is this?" unless s.sexp[0] == :iter && s.sexp[1][0] == :call && s.sexp[1][1] == nil && s.sexp[1][2] == :proc && s.sexp[1][3][0] == :arglist
+      raise "what is this?" unless s.sexp.sexp_type == :iter && s.sexp[1].sexp_type == :call && s.sexp[1][1] == nil && s.sexp[1][2] == :proc && s.sexp[1][3].sexp_type == :arglist
 
       block_args = s.sexp[2]
       if block_args
@@ -71,13 +70,17 @@ module Goling
         raise "hell #{str}"
       end
     end
+    
+    def compile
+      compile_with_return_to_var
+    end
 
     # Compile self
     #
     # * +return_variable+ - The return variable. Can either be a symbol representing the variable name or nil to skip variable assigning.
     # * +replace+         - A list of variables in need of a new unique name or replacement with inlined code
     #
-    def compile_with_return_to_var(return_variable, replace = {})
+    def compile_with_return_to_var(return_variable=nil, replace = {})
       s = Marshal.load(Marshal.dump(self)) # sexp handling is not clean cut
       args = @named_args.keys
       # args[] now has the symbolized argument names of the code block
@@ -134,66 +137,10 @@ module Goling
       end
 
       replace.each do |k,v|
-        replace_variable_references(code,v,k)
+        code.replace_variable_references!(v,k,@named_args)
       end
 
       return *args_code + [code]
-    end
-
-    # Recurcively replace all references in a code section
-    #
-    # * +code+        - The code haystack to search and replace in
-    # * +replacement+ - The replacement code. Either a Sexp (containing code to inline) or a symbol
-    # * +needle+      - The search needle
-    #
-    def replace_variable_references(code,replacement,needle)
-
-      #inline = replacement.kind_of?(Sexp)
-
-      case code[0]
-      when :lasgn
-        code[1]=replacement.sexp if code[1] == needle
-      when :lvar
-        if code[1] == needle
-          unless replacement.inline?
-            code[1]=replacement.sexp
-          end
-        end
-      when :call
-        code[2]=replacement.sexp if code[2] == needle
-      when :lvar
-        code[1]=replacement.sexp if code[1] == needle
-      end
-      # inlining requires complex code:
-      if replacement.inline? && [:iter, :block].include?(code[0])
-        # we have a inline and a block, replace any references with the sexp
-        code[1..-1].each_with_index do |h,i|
-          if h && h.kind_of?(Sexp) && h == Sexp.new(:lvar, needle)
-            # inline references like s(:lvar, :needle)
-            # indicates a call to the needle, thus code wants to inline
-            h[0] = replacement.sexp[0]
-            h[1] = replacement.sexp[1]
-          elsif h && h.kind_of?(Sexp) && @named_args.has_key?(needle) &&
-              Reduction.parse(@named_args[needle]).named_args.select{ |k,v|
-                h == Sexp.new(:call, Sexp.new(:lvar, needle), :[], Sexp.new(:arglist, Sexp.new(:lit, k)))
-              }.size == 1
-            # code is asking for a injection of one of the argument's with:
-            #  s(:call, s(:lvar, :needle), :[], s(:arglist, s(:lit, :argumen)))
-            # which in ruby looks like:
-            #  needle[:argument]
-            # which again is the way we support calling arguments of the neede
-            arg = h[3][1][1]
-            sexy = Marshal.load(Marshal.dump(Reduction.parse(Reduction.parse(@named_args[needle]).named_args[arg]).sexp)) # sexp handling is not clean cut
-            code[i+1] = sexy[3]
-          else
-            replace_variable_references(h,replacement,needle) if h && h.kind_of?(Sexp)
-          end
-        end
-      else
-        code[1..-1].each do |h|
-          replace_variable_references(h,replacement,needle) if h && h.kind_of?(Sexp)
-        end
-      end
     end
 
     def to_rexp

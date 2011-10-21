@@ -1,4 +1,3 @@
-# encoding: utf-8
 
 require 'sourcify'
 require 'goling/translators/javascript'
@@ -9,6 +8,11 @@ module Goling
 
     attr_accessor :proc, :sentence
 
+    # Lingquify a sentence
+    #
+    # * +str+     - A plain English string, or a plain English string with reductions in it.
+    # * +replace+ - In which "scope" to bind the code during compilation
+    #
     def initialize str,bind
 
       #
@@ -18,18 +22,14 @@ module Goling
       @bind = bind
       loop do
         rule = find_rule(str)
-        
-        reduced = Reduction.new(
-          :returns  => rule[:result],
-          :lang     => rule[:lang],
-          :inline   => rule[:inline],
-          :location => rule[:proc].source_location[0],
-          :line     => rule[:proc].source_location[1],
-          :regexp   => rule[:match].inspect,
-          :args     => rule[:match].match(str).to_a[1..-1],
-          :sexp     => rule[:proc].to_sexp,
-        )
-        str.gsub!(rule[:match],reduced.to_rexp)
+
+        reduction = rule[:proc].to_reduction :returns  => rule[:result],
+                                             :lang     => rule[:lang],
+                                             :inline   => rule[:inline],
+                                             :regexp   => rule[:match].inspect,
+                                             :args     => rule[:match].match(str).to_a[1..-1]
+
+        str.gsub!(rule[:match],reduction.to_rexp)
         break if /^{.*}$/ =~ str
       end
 
@@ -38,7 +38,7 @@ module Goling
       @merged_code = []
       if /^{(?<code>.*)}$/ =~ @encoded
         # successfully reduced entire string, compile it
-        code = Reduction::parse(code).compile_with_return_to_var(nil)
+        code = Reduction::parse(code).compile
 
         # and wrap it up
         @sexy = Sexp.new(:block,
@@ -63,6 +63,10 @@ module Goling
       end
     end
     
+    # Find a reduction rule for the string
+    #
+    # * +str+     - A plain English string, or a plain English string with reductions in it.
+    #
     def find_rule str
       found = Goling.rules.select do |rule|
         if rule[:match] =~ str
