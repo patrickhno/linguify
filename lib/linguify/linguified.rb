@@ -1,9 +1,9 @@
 # encoding: utf-8
 
 require 'sourcify'
-require 'goling/translators/javascript'
+require 'linguify/translators/javascript'
 
-module Goling
+module Linguify
 
   class Linguified
 
@@ -55,7 +55,7 @@ module Goling
         @@me = self
         eval to_ruby(
             Sexp.new(:call,
-              Sexp.new(:colon2, Sexp.new(:const, :Goling), :Linguified), :trampoline, Sexp.new(:arglist, Sexp.new(:lvar, :code))
+              Sexp.new(:colon2, Sexp.new(:const, :Linguify), :Linguified), :trampoline, Sexp.new(:arglist, Sexp.new(:lvar, :code))
             )
           ),bind
         raise "hell" unless @proc      
@@ -69,7 +69,7 @@ module Goling
     # * +str+     - A plain English string, or a plain English string with reductions in it.
     #
     def find_rule str
-      found = Goling.rules.select do |rule|
+      found = Linguify.rules.select do |rule|
         if rule[:match] =~ str
           true
         else

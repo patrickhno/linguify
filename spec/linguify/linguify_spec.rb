@@ -1,8 +1,8 @@
 # encoding: utf-8
 
-require 'goling'
+require 'linguify'
 
-describe Goling::Linguified, "#linguify" do
+describe Linguify::Linguified, "#linguify" do
 
   it "should reduce multiple rules into ruby code" do
 

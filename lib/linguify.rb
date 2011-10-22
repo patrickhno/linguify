@@ -1,10 +1,10 @@
 # encoding: utf-8
 
-require 'goling/linguified'
-require 'goling/reduction'
-require 'goling/sexp'
-require 'goling/string'
-require 'goling/proc'
+require 'linguify/linguified'
+require 'linguify/reduction'
+require 'linguify/sexp'
+require 'linguify/string'
+require 'linguify/proc'
 
 def reduce(regexp,&code)
   rule = regexp.values[0].kind_of?(Hash) ? {
@@ -20,10 +20,10 @@ def reduce(regexp,&code)
     :inline => false,
     :proc => code
   }
-  Goling::rules << rule
+  Linguify::rules << rule
 end
 
-module Goling
+module Linguify
 
   def self.rules
     @@rules ||= []

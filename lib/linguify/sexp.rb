@@ -34,7 +34,7 @@ class Sexp < Array
           h[0] = replacement.sexp[0]
           h[1] = replacement.sexp[1]
         elsif h && h.kind_of?(Sexp) && named_args.has_key?(needle) &&
-            Goling::Reduction.parse(named_args[needle]).named_args.select{ |k,v|
+            Linguify::Reduction.parse(named_args[needle]).named_args.select{ |k,v|
               h == Sexp.new(:call, Sexp.new(:lvar, needle), :[], Sexp.new(:arglist, Sexp.new(:lit, k)))
             }.size == 1
           # code is asking for a injection of one of the argument's with:
@@ -43,7 +43,7 @@ class Sexp < Array
           #  needle[:argument]
           # which again is the way we support calling arguments of the neede
           arg = h[3][1][1]
-          sexy = Marshal.load(Marshal.dump(Goling::Reduction.parse(Goling::Reduction.parse(named_args[needle]).named_args[arg]).sexp)) # sexp handling is not clean cut
+          sexy = Marshal.load(Marshal.dump(Linguify::Reduction.parse(Linguify::Reduction.parse(named_args[needle]).named_args[arg]).sexp)) # sexp handling is not clean cut
           self[i+1] = sexy[3]
         else
           h.replace_variable_references!(replacement,needle,named_args) if h && h.kind_of?(Sexp)

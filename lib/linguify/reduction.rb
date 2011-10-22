@@ -1,6 +1,6 @@
 # encoding: utf-8
 
-module Goling
+module Linguify
   
   class Replacement
     attr_reader :sexp

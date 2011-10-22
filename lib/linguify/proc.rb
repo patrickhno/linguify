@@ -2,7 +2,7 @@
 
 class Proc
   def to_reduction args={}
-    Goling::Reduction.new(
+    Linguify::Reduction.new(
       :returns  => args[:returns] || '',
       :lang     => args[:lang]    || :ruby,
       :inline   => args[:inline]  || false,
@@ -19,7 +19,7 @@ class Proc
 
     sexy = reduction.compile
     code = Marshal.load(Marshal.dump(sexy.first)) # sexy is not cleanly duplicated
-    code.replace_variable_references!(Goling::Replacement.new(:sexp => collection.name),:collection)
+    code.replace_variable_references!(Linguify::Replacement.new(:sexp => collection.name),:collection)
     code
   end
 end

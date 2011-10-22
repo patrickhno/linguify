@@ -13,11 +13,11 @@ require 'rake'
 
 require 'jeweler'
 Jeweler::Tasks.new do |gem|
-  gem.name = "goling"
-  gem.homepage = "http://github.com/patrickhno/goling"
+  gem.name = "linguify"
+  gem.homepage = "http://github.com/patrickhno/linguify"
   gem.license = "MIT"
-  gem.summary = %Q{Goling, the linguistic compiler.}
-  gem.description = %Q{Goling is a linguistic compiler allowing you to compile and execute plain english.}
+  gem.summary = %Q{Linguify, the linguistic compiler.}
+  gem.description = %Q{Linguify is a linguistic compiler allowing you to compile and execute plain english.}
   gem.email = "patrick.hanevold@gmail.com"
   gem.authors = ["Patrick Hanevold"]
   # dependencies defined in Gemfile
@@ -39,7 +39,7 @@ Rake::RDocTask.new do |rdoc|
   version = File.exist?('VERSION') ? File.read('VERSION') : ""
 
   rdoc.rdoc_dir = 'rdoc'
-  rdoc.title = "goling #{version}"
+  rdoc.title = "linguify #{version}"
   rdoc.rdoc_files.include('README*')
   rdoc.rdoc_files.include('lib/**/*.rb')
 end

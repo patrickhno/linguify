@@ -483,7 +483,7 @@ class Ruby2Js < SexpProcessor
   
 end
 
-module Goling
+module Linguify
   class Linguified
     
     def indent

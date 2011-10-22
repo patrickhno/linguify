@@ -1,17 +1,17 @@
-# Goling
+# Linguify
 
-Goling is a linguistic compiler allowing you to compile and execute plain english.
+Linguify is a linguistic compiler allowing you to compile and execute plain english.
 And thus allows you to program in plain english provided you have the reduction rules needed.
 
 Since the code ends up compiled like all code should be you can execute your code so amazingly fast I am in awe just to be able to write this divine text to you about it.
 
 ## Installation
 
-    gem install goling
+    gem install linguify
 
 ## Basic usage
 
-    require 'goling'
+    require 'linguify'
 
 	reduce /all directories/ => 'directories' do
 	  Dir.entries('.').select{ |f| f[0] != '.' && File.directory?(f) }
@@ -76,10 +76,10 @@ Or even:
 
 ## More advanced usage
 
-Goling supports mixing javascript and ruby.
+Linguify supports mixing javascript and ruby.
 A typical case would be to express NOSQL queries in plain English for everyones convenience.
 
-    require 'goling'
+    require 'linguify'
 
     reduce /a possible javascript NOSQL query/ => {:to => 'query', :lang => :js} do
       @db.forEach(lambda{ |record|
@@ -99,10 +99,10 @@ A typical case would be to express NOSQL queries in plain English for everyones 
     #     end
     #    "
 
-The nature of Golings expression reduction face pragmatic programmers with a urge to inline the code the arguments represents.
-Luckily Goling has evolved to embrace such minds. Goling is not for the general masses. It is for the mighty few pragmatics.
+The nature of Linguify's expression reduction face pragmatic programmers with a urge to inline the code the arguments represents.
+Luckily Linguify has evolved to embrace such minds. Linguify is not for the general masses. It is for the mighty few pragmatics.
 
-    require 'goling'
+    require 'linguify'
 
     reduce /inlined code/ => {:to => 'code', :lang => :ruby, :inline => true} do
       something.each do |foobar| # life is not worth living without psedo foobars
@@ -126,7 +126,7 @@ Luckily Goling has evolved to embrace such minds. Goling is not for the general 
 
 And you can even inline sub-expressions:
 
-    require 'goling'
+    require 'linguify'
 
 	reduce /sub expression/ => {:to => 'sub_expression', :lang => :ruby, :inline => true} do
 	  pp "this is the sub expression code"
@@ -158,7 +158,7 @@ And you can even inline sub-expressions:
 
 (The MIT License)
 
-Copyright (c) 2010 Patrick Hanevold
+Copyright (c) 2011 Patrick Hanevold
 
 Permission is hereby granted, free of charge, to any person obtaining a copy of this software and associated documentation files (the ‘Software’), to deal in the Software without restriction, including without limitation the rights to use, copy, modify, merge, publish, distribute, sublicense, and/or sell copies of the Software, and to permit persons to whom the Software is furnished to do so, subject to the following conditions:
 
