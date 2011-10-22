@@ -1,4 +1,7 @@
-# rewrite of Ruby2Ruby's sexp processor
+# encoding: utf-8
+#
+# A rewrite of Ruby2Ruby's sexp processor
+#
 
 require 'sexp_processor'
 

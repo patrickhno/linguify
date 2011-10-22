@@ -1,3 +1,4 @@
+# encoding: utf-8
 
 class Proc
   def to_reduction args={}

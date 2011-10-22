@@ -1,3 +1,4 @@
+# encoding: utf-8
 
 require 'sourcify'
 require 'goling/translators/javascript'
