@@ -469,6 +469,10 @@ class Ruby2Js < SexpProcessor
     exp.empty? ? "" : process(exp.shift)
   end
 
+  def process_str(exp)
+    "\"#{exp.shift.to_s}\""
+  end
+  
   def process_true(exp)
     "true"
   end
