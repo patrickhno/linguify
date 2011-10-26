@@ -7,152 +7,166 @@ Since the code ends up compiled like all code should be you can execute your cod
 
 ## Installation
 
-    gem install linguify
+``` ruby
+gem install linguify
+```
 
 ## Basic usage
 
-    require 'linguify'
+``` ruby
+require 'linguify'
 
-	reduce /all directories/ => 'directories' do
-	  Dir.entries('.').select{ |f| f[0] != '.' && File.directory?(f) }
-	end
+reduce /all directories/ => 'directories' do
+  Dir.entries('.').select{ |f| f[0] != '.' && File.directory?(f) }
+end
 
-	reduce /({directories:[^}]*}) recursively/ => 'directories' do |dirs|
-	  all_dirs = dirs
-	  Find.find(dirs) do |path|
-	    if FileTest.directory?(path)
-	      if File.basename(path)[0] == '.'
-	        Find.prune       # Don't look any further into this directory.
-	      else
-			all_dirs << path
-	        next
-	      end
-	    end
-	  end
-	  all_dirs
-	end
+reduce /({directories:[^}]*}) recursively/ => 'directories' do |dirs|
+  all_dirs = dirs
+  Find.find(dirs) do |path|
+    if FileTest.directory?(path)
+      if File.basename(path)[0] == '.'
+        Find.prune       # Don't look any further into this directory.
+      else
+		all_dirs << path
+        next
+      end
+    end
+  end
+  all_dirs
+end
 
-	reduce /all files inside ({directories:[^}]*})/ => 'files' do |dirs|
-	  dirs.map{ |f| File.new(f, "r") }
-	end
+reduce /all files inside ({directories:[^}]*})/ => 'files' do |dirs|
+  dirs.map{ |f| File.new(f, "r") }
+end
 
-	reduce /view ({files:[^}]*})/ => '' do |files|
-	  files.each do |file|
-	    pp file
-	  end
-	end
+reduce /view ({files:[^}]*})/ => '' do |files|
+  files.each do |file|
+    pp file
+  end
+end
 
-	"view all files inside all directories recursively".linguify.to_ruby
-    # => "code = lambda do
-    #       directories_0 = Dir.entries(\".\").select { |f| ((not (f[0] == \".\")) and File.directory?(f)) }
-    #       directories_1 = (all_dirs = directories_0
-	#       Find.find(directories_0) do |path|
-	#         if FileTest.directory?(path) then
-	#           if (File.basename(path)[0] == \".\") then
-	#             Find.prune
-	#           else
-	#             (all_dirs << path)
-	#             next
-	#           end
-	#         end
-	#       end
-	#       all_dirs)
-	#       files_2 = directories_1.map { |f| File.new(f, \"r\") }
-	#       files_2.each { |file| pp(file) }
-	#     end
-	#   " 
+"view all files inside all directories recursively".linguify.to_ruby
+# => "code = lambda do
+#       directories_0 = Dir.entries(\".\").select { |f| ((not (f[0] == \".\")) and File.directory?(f)) }
+#       directories_1 = (all_dirs = directories_0
+#       Find.find(directories_0) do |path|
+#         if FileTest.directory?(path) then
+#           if (File.basename(path)[0] == \".\") then
+#             Find.prune
+#           else
+#             (all_dirs << path)
+#             next
+#           end
+#         end
+#       end
+#       all_dirs)
+#       files_2 = directories_1.map { |f| File.new(f, \"r\") }
+#       files_2.each { |file| pp(file) }
+#     end
+#   " 
+```
 	
 And if you simply want to execute your magnificent piece of art:
 
-	"view all files inside all directories recursively".linguify.run
+``` ruby
+"view all files inside all directories recursively".linguify.run
+```
 
 Or even:
 
-    # compile once, run plenty
-    code = "view all files inside all directories recursively".linguify
-    loop do
-      code.run
-    end
+``` ruby
+# compile once, run plenty
+code = "view all files inside all directories recursively".linguify
+loop do
+  code.run
+end
+```
 
 ## More advanced usage
 
 Linguify supports mixing javascript and ruby.
 A typical case would be to express NOSQL queries in plain English for everyones convenience.
 
-    require 'linguify'
+``` ruby
+require 'linguify'
 
-    reduce /a possible javascript NOSQL query/ => {:to => 'query', :lang => :js} do
-      @db.forEach(lambda{ |record|
-          emit(record);
-        }
-      )
-    end
+reduce /a possible javascript NOSQL query/ => {:to => 'query', :lang => :js} do
+  @db.forEach(lambda{ |record|
+      emit(record);
+    }
+  )
+end
 
-    reduce /execute ({query:[^}]*})/ => '' do |query|
-      db.map query
-    end
+reduce /execute ({query:[^}]*})/ => '' do |query|
+  db.map query
+end
 
-    "execute a possible javascript NOSQL query".linguify.to_ruby
-    # => "code = lambda do
-    #       query = \"function(){\\n  this.db.forEach(function(record){\\n    emit(record)\\n  });\\n}\"
-    #       db.map(query)
-    #     end
-    #    "
+"execute a possible javascript NOSQL query".linguify.to_ruby
+# => "code = lambda do
+#       query = \"function(){\\n  this.db.forEach(function(record){\\n    emit(record)\\n  });\\n}\"
+#       db.map(query)
+#     end
+#    "
+```
 
 The nature of Linguify's expression reduction face pragmatic programmers with a urge to inline the code the arguments represents.
 Luckily Linguify has evolved to embrace such minds. Linguify is not for the general masses. It is for the mighty few pragmatics.
 
-    require 'linguify'
+``` ruby
+require 'linguify'
 
-    reduce /inlined code/ => {:to => 'code', :lang => :ruby, :inline => true} do
-      something.each do |foobar| # life is not worth living without psedo foobars
-        pp foobar
-      end
-    end
+reduce /inlined code/ => {:to => 'code', :lang => :ruby, :inline => true} do
+  something.each do |foobar| # life is not worth living without psedo foobars
+    pp foobar
+  end
+end
 
-    reduce /execute ({code:[^}]*})/ => '' do |code|
-      pp "hey mum"
-      code
-      pp "you will never know what I just did"
-	end
+reduce /execute ({code:[^}]*})/ => '' do |code|
+  pp "hey mum"
+  code
+  pp "you will never know what I just did"
+end
 
-	"execute inlined code".linguify.to_ruby
-	# => "code = lambda do
-	#       (pp(\"hey mum\")
-	#       (something.each { |foobar| pp(foobar) })
-	#       pp(\"you will never know what I just did\"))
-	#     end
-	#    "
+"execute inlined code".linguify.to_ruby
+# => "code = lambda do
+#       (pp(\"hey mum\")
+#       (something.each { |foobar| pp(foobar) })
+#       pp(\"you will never know what I just did\"))
+#     end
+#    "
+```
 
 And you can even inline sub-expressions:
 
-    require 'linguify'
+``` ruby
+require 'linguify'
 
-	reduce /sub expression/ => {:to => 'sub_expression', :lang => :ruby, :inline => true} do
-	  pp "this is the sub expression code"
-	end
+reduce /sub expression/ => {:to => 'sub_expression', :lang => :ruby, :inline => true} do
+  pp "this is the sub expression code"
+end
 
-	reduce /({sub_expression:[^}]*}) of inlined code/ => {:to => 'code', :lang => :ruby, :inline => true} do |sub|
-	  something.each do |foobar| # life is not worth living without psedo foobars
-	    pp foobar
-	  end
-	end
+reduce /({sub_expression:[^}]*}) of inlined code/ => {:to => 'code', :lang => :ruby, :inline => true} do |sub|
+  something.each do |foobar| # life is not worth living without psedo foobars
+    pp foobar
+  end
+end
 
-	reduce /execute ({code:[^}]*})/ => '' do |code|
-	  pp "hey mum"
-	  code
-	  code[:sub]
-	  pp "you will never know what I just did"
-	end
+reduce /execute ({code:[^}]*})/ => '' do |code|
+  pp "hey mum"
+  code
+  code[:sub]
+  pp "you will never know what I just did"
+end
 
-	"execute sub expression of inlined code".linguify.to_ruby
-	# => "code = lambda do
-	#       (pp(\"hey mum\")
-	#       (something.each { |foobar| pp(foobar) })
-	#       pp(\"this is the sub expression code\")
-	#       pp(\"you will never know what I just did\"))
-	#     end
-	#    "
+"execute sub expression of inlined code".linguify.to_ruby
+# => "code = lambda do
+#       (pp(\"hey mum\")
+#       (something.each { |foobar| pp(foobar) })
+#       pp(\"this is the sub expression code\")
+#       pp(\"you will never know what I just did\"))
+#     end
+#    "
+```
 
 ## License
 
