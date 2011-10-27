@@ -6,9 +6,14 @@ class Sexp < Array
   #
   # @param [ Sexp, Symbol ] replacement The replacement code. Either a Sexp (containing code to inline) or a symbol
   # @param [ Sexp ] needle The search needle
+  # @param [ Hash ] named_args The arguments of the code block
   #
-  def replace_variable_references!(replacement,needle,named_args="")
+  def replace_variable_references! params
     
+    replacement = params[:replacement]
+    needle      = params[:needle]
+    named_args  = params[:named_args] || ''
+
     case sexp_type
     when :lasgn
       self[1]=replacement.sexp if self[1] == needle
@@ -45,12 +50,12 @@ class Sexp < Array
           sexy = Marshal.load(Marshal.dump(Linguify::Reduction.parse(Linguify::Reduction.parse(named_args[needle]).named_args[arg]).sexp)) # sexp handling is not clean cut
           self[i+1] = sexy[3]
         else
-          h.replace_variable_references!(replacement,needle,named_args) if h && h.kind_of?(Sexp)
+          h.replace_variable_references!(:replacement => replacement, :needle => needle, :named_args => named_args) if h && h.kind_of?(Sexp)
         end
       end
     else
       self[1..-1].each do |h|
-        h.replace_variable_references!(replacement,needle,named_args) if h && h.kind_of?(Sexp)
+        h.replace_variable_references!(:replacement => replacement, :needle => needle, :named_args => named_args) if h && h.kind_of?(Sexp)
       end
     end
   end

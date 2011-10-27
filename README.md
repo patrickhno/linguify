@@ -39,7 +39,7 @@ reduce /all files inside ({directories:[^}]*})/ => 'files' do |dirs|
   dirs.map{ |f| File.new(f, "r") }
 end
 
-reduce /view ({files:[^}]*})/ => '' do |files|
+reduce /view ({files:[^}]*})/ do |files|
   files.each do |file|
     pp file
   end
@@ -97,7 +97,7 @@ reduce /a possible javascript NOSQL query/ => {:to => 'query', :lang => :js} do
   )
 end
 
-reduce /execute ({query:[^}]*})/ => '' do |query|
+reduce /execute ({query:[^}]*})/ do |query|
   db.map query
 end
 
@@ -121,7 +121,7 @@ reduce /inlined code/ => {:to => 'code', :lang => :ruby, :inline => true} do
   end
 end
 
-reduce /execute ({code:[^}]*})/ => '' do |code|
+reduce /execute ({code:[^}]*})/ do |code|
   pp "hey mum"
   code
   pp "you will never know what I just did"
@@ -151,7 +151,7 @@ reduce /({sub_expression:[^}]*}) of inlined code/ => {:to => 'code', :lang => :r
   end
 end
 
-reduce /execute ({code:[^}]*})/ => '' do |code|
+reduce /execute ({code:[^}]*})/ do |code|
   pp "hey mum"
   code
   code[:sub]

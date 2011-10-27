@@ -24,7 +24,7 @@ class Proc
 
     sexy = reduction.compile
     code = Marshal.load(Marshal.dump(sexy.first)) # sexy is not cleanly duplicated
-    code.replace_variable_references!(Linguify::Replacement.new(:sexp => collection.name),:collection)
+    code.replace_variable_references! :replacement => Linguify::Replacement.new(:sexp => collection.name), :needle => :collection
     code
   end
 end

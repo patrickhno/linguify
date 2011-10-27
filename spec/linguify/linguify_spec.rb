@@ -29,7 +29,7 @@ describe Linguify::Linguified, "#linguify" do
       dirs.map{ |f| File.new(f, "r") }
     end
 
-    reduce /view ({files:[^}]*})/ => '' do |files|
+    reduce /view ({files:[^}]*})/ do |files|
       files.each do |file|
         pp file
       end
@@ -46,7 +46,7 @@ describe Linguify::Linguified, "#linguify" do
       )
     end
 
-    reduce /execute ({query:[^}]*})/ => '' do |query|
+    reduce /execute ({query:[^}]*})/ do |query|
       db.map query
     end
 
@@ -64,7 +64,7 @@ describe Linguify::Linguified, "#linguify" do
       end
     end
 
-    reduce /execute ({code:[^}]*})/ => '' do |code|
+    reduce /execute ({code:[^}]*})/ do |code|
       pp "hey mum"
       code
       code[:sub]

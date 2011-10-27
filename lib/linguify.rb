@@ -32,19 +32,31 @@ require 'linguify/proc'
 #   end
 #
 def reduce(regexp,&code)
-  rule = regexp.values[0].kind_of?(Hash) ? {
-    :match  => regexp.keys[0],
-    :result => regexp.values[0][:to]     || '',
-    :lang   => regexp.values[0][:lang]   || :ruby,
-    :inline => regexp.values[0][:inline] || false,
-    :proc => code
-  } : {
-    :match  => regexp.keys[0],
-    :result => regexp.values[0],
-    :lang   => :ruby,
-    :inline => false,
-    :proc => code
-  }
+  rule = if regexp.kind_of? Regexp
+    {
+      :match  => regexp,
+      :result => '',
+      :lang   => :ruby,
+      :inline => false,
+      :proc => code
+    }
+  elsif regexp.values[0].kind_of?(Hash)
+    {
+      :match  => regexp.keys[0],
+      :result => regexp.values[0][:to]     || '',
+      :lang   => regexp.values[0][:lang]   || :ruby,
+      :inline => regexp.values[0][:inline] || false,
+      :proc => code
+    }
+  else
+   {
+      :match  => regexp.keys[0],
+      :result => regexp.values[0],
+      :lang   => :ruby,
+      :inline => false,
+      :proc => code
+    }
+  end
   Linguify::rules << rule
 end
 

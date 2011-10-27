@@ -85,11 +85,13 @@ module Linguify
 
     # Compile self
     #
-    # @param [ Symbol,nil ] variable The variable in the code wanting the result.
-    # @param [ Array<Symbol,Sexp>] replacements A list of variables in need of a new unique name or replacement with inlined code
+    # @param [ Symbol,nil ] return_variable The variable in the code wanting the result.
+    # @param [ Array<Symbol,Sexp>] replacement A list of variables in need of a new unique name or replacement with inlined code
     # @returns [ Array<Sexp> ] the compiled code
     #
-    def compile_with_return_to_var(return_variable=nil, replace = {})
+    def compile_with_return_to_var params={}
+      replace = params[:replace] || {}
+
       s = Marshal.load(Marshal.dump(self)) # sexp handling is not clean cut
       args = @named_args.keys
       # args[] now has the symbolized argument names of the code block
@@ -102,7 +104,7 @@ module Linguify
           red = Reduction::parse(arg)
           if red.lang != lang && red.lang == :js && lang == :ruby
             # paste javascript code into a ruby variable
-            code = red.compile_with_return_to_var(nil,replace)
+            code = red.compile_with_return_to_var :replace => replace
             clone = Marshal.load(Marshal.dump(code)) # code is not cleanly duplicated
             code = Sexp.new(:iter,Sexp.new(:call, nil, :lambda, Sexp.new(:arglist)), nil,
               Sexp.new(:block,
@@ -115,10 +117,10 @@ module Linguify
           else
             raise "trying to reference #{red.lang} code in #{lang} code" if red.lang != lang
             if red.inline
-              code = red.compile_with_return_to_var(nil,replace)
+              code = red.compile_with_return_to_var :replace => replace
               replace[args[i]] = Replacement.new(:sexp => Sexp.new(:block,*code), :inline => true)
             else
-              code = red.compile_with_return_to_var("#{ret}_#{n}".to_sym,replace)
+              code = red.compile_with_return_to_var :return_variable => "#{ret}_#{n}".to_sym, :replace => replace
               args_code += code
               replace[args[i]] = Replacement.new(:sexp => "#{ret}_#{n}".to_sym)
             end
@@ -131,22 +133,22 @@ module Linguify
         end
       end
 
-      if return_variable
+      if params[:return_variable]
         if s.sexp[3][0] == :block
-          code = Sexp.new(:lasgn, return_variable,
+          code = Sexp.new(:lasgn, params[:return_variable],
             Sexp.new(:block,
               *(s.sexp[3][1..-1].map{ |s| s.dup })
             )
           )
         else
-          code = Sexp.new(:lasgn, return_variable, s.sexp[3].dup)
+          code = Sexp.new(:lasgn, params[:return_variable], s.sexp[3].dup)
         end
       else
         code = s.sexp[3].dup
       end
 
       replace.each do |k,v|
-        code.replace_variable_references!(v,k,@named_args)
+        code.replace_variable_references! :replacement => v, :needle => k, :named_args => @named_args
       end
 
       return *args_code + [code]
