@@ -4,9 +4,8 @@ class Sexp < Array
 
   # Recurcively replace all references in a code section
   #
-  # * +code+        - The code haystack to search and replace in
-  # * +replacement+ - The replacement code. Either a Sexp (containing code to inline) or a symbol
-  # * +needle+      - The search needle
+  # @param [ Sexp ] or [ Symbol ] replacement The replacement code. Either a Sexp (containing code to inline) or a symbol
+  # @param [ Sexp ] needle The search needle
   #
   def replace_variable_references!(replacement,needle,named_args="")
     

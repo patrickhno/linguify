@@ -11,8 +11,8 @@ module Linguify
 
     # Lingquify a sentence
     #
-    # * +str+     - A plain English string, or a plain English string with reductions in it.
-    # * +replace+ - In which "scope" to bind the code during compilation
+    # @param [ String ] string A plain English string, or a plain English string with reductions in it.
+    # @param [ Binding ] binding See +Kernel#eval+
     #
     def initialize str,bind
 
@@ -66,7 +66,7 @@ module Linguify
     
     # Find a reduction rule for the string
     #
-    # * +str+     - A plain English string, or a plain English string with reductions in it.
+    # @param [ String ] string A plain English string, or a plain English string with reductions in it.
     #
     def find_rule str
       found = Linguify.rules.select do |rule|

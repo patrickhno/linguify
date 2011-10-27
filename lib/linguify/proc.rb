@@ -1,6 +1,11 @@
 # encoding: utf-8
 
 class Proc
+
+  # Translate the Proc to a +Reduction+.
+  #
+  # @returns [ Reduction ] A +Reduction+ containing the code of the Proc.
+  #
   def to_reduction args={}
     Linguify::Reduction.new(
       :returns  => args[:returns] || '',

@@ -36,6 +36,10 @@ module Linguify
       @@reductions << self
     end
 
+    # Extract the arguments from the code block of this Reduction.
+    #
+    # @returns [ Hash ] Key valye pairs of symbolized variable names and the reduction reference.
+    #
     def determine_arguments
       s = Marshal.load(Marshal.dump(self)) # sexp handling is not clean cut
       raise "what is this?" unless s.sexp.sexp_type == :iter && s.sexp[1].sexp_type == :call && s.sexp[1][1] == nil && s.sexp[1][2] == :proc && s.sexp[1][3].sexp_type == :arglist
@@ -57,11 +61,14 @@ module Linguify
           raise "unsupported argument type #{args}"
         end
       end
-      # args[] now has the symbolized argument names of the code block
       @named_args = Hash[*args.zip(@args).flatten] if args
       @named_args ||= {}
     end
 
+    # Parse the string and return its reduction rule.
+    #
+    # @returns [ Reduction ] The reduction rule of the string.
+    #
     def self.parse str
       if /^{(?<return>[^:]*):(?<rid>[0-9]+)}$/ =~ str
         @@reductions[rid.to_i]
@@ -78,8 +85,9 @@ module Linguify
 
     # Compile self
     #
-    # * +return_variable+ - The return variable. Can either be a symbol representing the variable name or nil to skip variable assigning.
-    # * +replace+         - A list of variables in need of a new unique name or replacement with inlined code
+    # @param [ Symbol,nil ] variable The variable in the code wanting the result.
+    # @param [ Array<Symbol,Sexp>] replacements A list of variables in need of a new unique name or replacement with inlined code
+    # @returns [ Array<Sexp> ] the compiled code
     #
     def compile_with_return_to_var(return_variable=nil, replace = {})
       s = Marshal.load(Marshal.dump(self)) # sexp handling is not clean cut
@@ -144,6 +152,10 @@ module Linguify
       return *args_code + [code]
     end
 
+    # Get the reduction reference for this Reduction.
+    #
+    # @returns [ String ] A unique string reference refering to this Reduction.
+    #
     def to_rexp
       raise "hell" if returns.kind_of?(Array)
       "{#{returns}:#{reduction_id}}"
