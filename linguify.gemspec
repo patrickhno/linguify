@@ -5,18 +5,17 @@
 
 Gem::Specification.new do |s|
   s.name = %q{linguify}
-  s.version = "0.3.0"
+  s.version = "0.4.0"
 
   s.required_rubygems_version = Gem::Requirement.new(">= 0") if s.respond_to? :required_rubygems_version=
   s.authors = [%q{Patrick Hanevold}]
-  s.date = %q{2011-10-22}
+  s.date = %q{2011-10-27}
   s.description = %q{Linguify is a linguistic compiler allowing you to compile and execute plain english.}
   s.email = %q{patrick.hanevold@gmail.com}
   s.extra_rdoc_files = [
     "README.md"
   ]
   s.files = [
-    ".document",
     "Gemfile",
     "Gemfile.lock",
     "README.md",
@@ -29,6 +28,7 @@ Gem::Specification.new do |s|
     "lib/linguify/sexp.rb",
     "lib/linguify/string.rb",
     "lib/linguify/translators/javascript.rb",
+    "linguify.gemspec",
     "spec/linguify/linguify_spec.rb",
     "tasks/spec.rake"
   ]
