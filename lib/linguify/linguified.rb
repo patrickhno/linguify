@@ -70,7 +70,7 @@ module Linguify
                 *code
               )
             )
-          ),
+          )
         )
 
         @@me = self
