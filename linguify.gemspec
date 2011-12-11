@@ -4,14 +4,14 @@
 # -*- encoding: utf-8 -*-
 
 Gem::Specification.new do |s|
-  s.name = %q{linguify}
-  s.version = "0.4.0"
+  s.name = "linguify"
+  s.version = "0.4.1"
 
   s.required_rubygems_version = Gem::Requirement.new(">= 0") if s.respond_to? :required_rubygems_version=
-  s.authors = [%q{Patrick Hanevold}]
-  s.date = %q{2011-10-27}
-  s.description = %q{Linguify is a linguistic compiler allowing you to compile and execute plain english.}
-  s.email = %q{patrick.hanevold@gmail.com}
+  s.authors = ["Patrick Hanevold"]
+  s.date = "2011-12-11"
+  s.description = "Linguify is a linguistic compiler allowing you to compile and execute plain english."
+  s.email = "patrick.hanevold@gmail.com"
   s.extra_rdoc_files = [
     "README.md"
   ]
@@ -32,11 +32,11 @@ Gem::Specification.new do |s|
     "spec/linguify/linguify_spec.rb",
     "tasks/spec.rake"
   ]
-  s.homepage = %q{http://github.com/patrickhno/linguify}
-  s.licenses = [%q{MIT}]
-  s.require_paths = [%q{lib}]
-  s.rubygems_version = %q{1.8.8}
-  s.summary = %q{Linguify, the linguistic compiler.}
+  s.homepage = "http://github.com/patrickhno/linguify"
+  s.licenses = ["MIT"]
+  s.require_paths = ["lib"]
+  s.rubygems_version = "1.8.11"
+  s.summary = "Linguify, the linguistic compiler."
 
   if s.respond_to? :specification_version then
     s.specification_version = 3
