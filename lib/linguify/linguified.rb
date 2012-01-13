@@ -51,7 +51,7 @@ module Linguify
                                              :regexp   => rule[:match].inspect,
                                              :args     => rule[:match].match(str).to_a[1..-1]
 
-        str.gsub!(rule[:match],reduction.to_rexp)
+        str = reduce_string(str,rule[:match],reduction.to_rexp)
         break if /^{.*}$/ =~ str
       end
 
@@ -84,7 +84,66 @@ module Linguify
         raise "hell"
       end
     end
-    
+
+    # Reduce a string with a matching reduction expression
+    #
+    # @param [ String ] the sentence to reduce   (haystack)
+    # @param [ Regexp ] the reduction expression (search needle)
+    # @param [ String ] the replacement
+    # @returns [ String ] the reduced string
+    #
+    def reduce_string str,match_expression,reduction
+      match = match_expression.match(str).to_a
+      if match.size == 1
+        str.gsub(match_expression,reduction)
+      else
+        needle = match[0]
+        splitted = Linguified.informative_split(str,needle)
+
+        splitted.map{ |split| split.kind_of?(Symbol) ? reduction : split }.join
+      end
+    end
+
+    # Split a string by given search needle into an array with split indicators
+    #
+    # @param [ String ] the string to search     (haystack)
+    # @param [ String ] needle                   (search needle)
+    # @returns [ Array ] the remaining pieces and needle tags
+    #
+    def self.informative_split str,needle
+      splitted = str.split(needle)
+      if str.index(needle) > 0
+        if splitted.size & 1 == 0
+          splitted.map{ |m| [m,:needle] }.flatten[0..-2]
+        else
+          splitted.map{ |m| [m,:needle] }.flatten
+        end
+      else
+        if splitted.size > 0
+          splitted.map{ |m| [m,:needle] }.flatten[1..-2]
+        elsif str == needle
+          [ :needle ]
+        else
+          []
+        end
+      end
+    end
+
+    # Test if a informative split contains needles on word boundaries
+    #
+    # @param [ Array ] the splitted string
+    # @returns [ Boolean ] true if so
+    #
+    def self.has_needle_on_word_boundary? splitted
+      splitted.each_with_index do |split,i|
+        if split.kind_of? String
+          word_bound = i == 0 ? split[-1] == ' ' : split[0] == ' ' || split[-1] == ' '
+          return true if word_bound
+        end
+      end
+      false
+    end
+
     # Find a reduction rule for the string
     #
     # @param [ String ] string A plain English string, or a plain English string with reductions in it.
@@ -92,7 +151,17 @@ module Linguify
     def find_rule str
       found = Linguify.rules.select do |rule|
         if rule[:match] =~ str
-          true
+          # ok, it matched, but only alow matches with word boundaries
+          match = rule[:match].match(str).to_a
+          if match.size == 1
+            # one match means the search space contains just the needle, so its a perfect match
+            true
+          else
+            # multiple matches, check if the needle is found on word boundaries
+            raise "uh?" unless match.size == 2
+            needle = match[1]
+            Linguified.has_needle_on_word_boundary? Linguified.informative_split(str,needle)
+          end
         else
           false
         end

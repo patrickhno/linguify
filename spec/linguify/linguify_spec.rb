@@ -25,6 +25,20 @@ require 'linguify'
 
 describe Linguify::Linguified, "#linguify" do
 
+  it "finds words in sentences" do
+    Linguify::Linguified.informative_split("I fight for the users","users").should       == ["I fight for the ", :needle]
+    Linguify::Linguified.informative_split("I fight for the users","for the").should     == ["I fight ", :needle, " users"]
+    Linguify::Linguified.informative_split("I fight for the users","t for the u").should == ["I figh", :needle, "sers"]
+    Linguify::Linguified.informative_split("I fight for the users","I").should           == [:needle, " fight for the users"]
+  end
+
+  it "respects word boundaries" do
+    Linguify::Linguified.has_needle_on_word_boundary?(Linguify::Linguified.informative_split("I fight for the users","users")).should       == true
+    Linguify::Linguified.has_needle_on_word_boundary?(Linguify::Linguified.informative_split("I fight for the users","for the")).should     == true
+    Linguify::Linguified.has_needle_on_word_boundary?(Linguify::Linguified.informative_split("I fight for the users","t for the u")).should == false
+    Linguify::Linguified.has_needle_on_word_boundary?(Linguify::Linguified.informative_split("I fight for the users","I")).should           == true
+  end
+
   it "should reduce multiple rules into ruby code" do
 
     reduce /all directories/ => 'directories' do
