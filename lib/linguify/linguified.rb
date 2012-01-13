@@ -51,7 +51,7 @@ module Linguify
                                              :regexp   => rule[:match].inspect,
                                              :args     => rule[:match].match(str).to_a[1..-1]
 
-        str = reduce_string(str,rule[:match],reduction.to_rexp)
+        str = Linguified.reduce_string(str,rule[:match],reduction.to_rexp)
         break if /^{.*}$/ =~ str
       end
 
@@ -92,10 +92,28 @@ module Linguify
     # @param [ String ] the replacement
     # @returns [ String ] the reduced string
     #
-    def reduce_string str,match_expression,reduction
+    def self.reduce_string str,match_expression,reduction
       match = match_expression.match(str).to_a
       if match.size == 1
-        str.gsub(match_expression,reduction)
+        needle = match[0]
+        splitted = Linguified.informative_split(str,needle)
+        prev = ' '
+        i = -1
+        splitted.map! do |split|
+          prev = splitted[i] if i>=0
+          nxt  = splitted[i+2] || ' '
+          i += 1
+          if split.kind_of?(Symbol)
+            if prev[-1] == ' ' and nxt[0] == ' '
+              reduction
+            else
+              needle
+            end
+          else
+            split
+          end
+        end
+        splitted.join
       else
         needle = match[0]
         splitted = Linguified.informative_split(str,needle)
@@ -113,11 +131,7 @@ module Linguify
     def self.informative_split str,needle
       splitted = str.split(needle)
       if str.index(needle) > 0
-        if splitted.size & 1 == 0
-          splitted.map{ |m| [m,:needle] }.flatten[0..-2]
-        else
-          splitted.map{ |m| [m,:needle] }.flatten
-        end
+        splitted.map{ |m| [m,:needle] }.flatten[0..splitted.size+str.scan(needle).size-1]
       else
         if splitted.size > 0
           splitted.map{ |m| [m,:needle] }.flatten[1..-2]

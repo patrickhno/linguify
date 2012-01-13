@@ -26,17 +26,25 @@ require 'linguify'
 describe Linguify::Linguified, "#linguify" do
 
   it "finds words in sentences" do
-    Linguify::Linguified.informative_split("I fight for the users","users").should       == ["I fight for the ", :needle]
-    Linguify::Linguified.informative_split("I fight for the users","for the").should     == ["I fight ", :needle, " users"]
-    Linguify::Linguified.informative_split("I fight for the users","t for the u").should == ["I figh", :needle, "sers"]
-    Linguify::Linguified.informative_split("I fight for the users","I").should           == [:needle, " fight for the users"]
+    l = Linguify::Linguified
+    l.informative_split("I fight for the users","users").should       == ["I fight for the ", :needle]
+    l.informative_split("I fight for the users","for the").should     == ["I fight ", :needle, " users"]
+    l.informative_split("I fight for the users","t for the u").should == ["I figh", :needle, "sers"]
+    l.informative_split("I fight for the users","I").should           == [:needle, " fight for the users"]
+    l.informative_split('I fight for the users with email "user@domain.com"',"user").should == ["I fight for the ", :needle, "s with email \"", :needle, "@domain.com\""]
   end
 
   it "respects word boundaries" do
-    Linguify::Linguified.has_needle_on_word_boundary?(Linguify::Linguified.informative_split("I fight for the users","users")).should       == true
-    Linguify::Linguified.has_needle_on_word_boundary?(Linguify::Linguified.informative_split("I fight for the users","for the")).should     == true
-    Linguify::Linguified.has_needle_on_word_boundary?(Linguify::Linguified.informative_split("I fight for the users","t for the u")).should == false
-    Linguify::Linguified.has_needle_on_word_boundary?(Linguify::Linguified.informative_split("I fight for the users","I")).should           == true
+    l = Linguify::Linguified
+    l.has_needle_on_word_boundary?(Linguify::Linguified.informative_split("I fight for the users","users")).should       == true
+    l.has_needle_on_word_boundary?(Linguify::Linguified.informative_split("I fight for the users","for the")).should     == true
+    l.has_needle_on_word_boundary?(Linguify::Linguified.informative_split("I fight for the users","t for the u")).should == false
+    l.has_needle_on_word_boundary?(Linguify::Linguified.informative_split("I fight for the users","I")).should           == true
+  end
+
+  it "respects word boundaries on reductions" do
+    l = Linguify::Linguified
+    l.reduce_string('I fight for a user with email "user@domain.com"',/user/,"{needle}").should == 'I fight for a {needle} with email "user@domain.com"'
   end
 
   it "should reduce multiple rules into ruby code" do
