@@ -55,34 +55,28 @@ module Linguify
         break if /^{:[0-9]*}$/ =~ str
       end
 
-      @encoded = str
-
       @merged_code = []
-      if /^{(?<code>.*)}$/ =~ @encoded
-        # successfully reduced entire string, compile it
-        code = Reduction::parse(code).compile
 
-        # and wrap it up
-        @sexy = Sexp.new(:block,
-          Sexp.new(:lasgn,:code, Sexp.new(:iter,
-            Sexp.new(:call, nil, :lambda, Sexp.new(:arglist)), nil,
-              Sexp.new(:block,
-                *code
-              )
-            )
+      #
+      # successfully reduced entire string, compile it
+      #
+
+      code = Reduction::parse(str).compile
+
+      #if @dispatch_exceptions
+      #  @sexy = Sexp.debug_envelope(code)
+      #else
+        @sexy = Sexp.lambda_envelope(code)
+      #end
+
+      # let ruby compile a proc out of the actual code
+      # the trampoline function will receive the compiled Proc
+      @@me = self
+      eval to_ruby(
+          Sexp.new(:call,
+            Sexp.new(:colon2, Sexp.new(:const, :Linguify), :Linguified), :trampoline, Sexp.new(:arglist, Sexp.new(:lvar, :code))
           )
-        )
-
-        @@me = self
-        eval to_ruby(
-            Sexp.new(:call,
-              Sexp.new(:colon2, Sexp.new(:const, :Linguify), :Linguified), :trampoline, Sexp.new(:arglist, Sexp.new(:lvar, :code))
-            )
-          ),bind
-        raise "hell" unless @proc      
-      else
-        raise "hell"
-      end
+        ),bind
     end
 
     # Reduce a string with a matching reduction expression

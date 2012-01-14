@@ -1,6 +1,6 @@
 # encoding: utf-8
 
-# Copyright (c) 2011 Patrick Hanevold.
+# Copyright (c) 2011-2012 Patrick Hanevold.
 #
 # Permission is hereby granted, free of charge, to any person obtaining
 # a copy of this software and associated documentation files (the
@@ -80,6 +80,46 @@ class Sexp < Array
       end
     end
   end
+
+  # Envelope a Sexp in a lambda
+  #
+  # @param [ Sexp ] code The Sexp to envelope
+  # @returns [ Sexp ] result The enveloped sexp
+  #
+  def self.lambda_envelope code
+    # and wrap it up in a lambda envelope for the sexp representation
+    Sexp.new(:block,
+      Sexp.new(:lasgn,:code, Sexp.new(:iter,
+        Sexp.new(:call, nil, :lambda, Sexp.new(:arglist)), nil,
+          Sexp.new(:block,
+            *code
+          )
+        )
+      )
+    )
+  end
+
+  ##
+  ## currently not in use
+  ## 1.9.2 p180 does'nt give us a backtrace from the other side
+  ##
+  # Envelope a Sexp in the debug envelope
+  # which basicly dispatch exceptions into our unitverse
+  #
+  # @param [ Sexp ] code The Sexp to envelope
+  # @returns [ Sexp ] result The enveloped sexp
+  #
+  #def self.debug_envelope code
+  #  Sexp.new(:block,
+  #    Sexp.new(:lasgn,:code, Sexp.new(:iter,
+  #      Sexp.new(:call, nil, :lambda, Sexp.new(:arglist)), nil,
+  #        Sexp.new(:rescue,
+  #          Sexp.new(:block,*code),
+  #          Sexp.new(:resbody,
+  #            Sexp.new(:array, Sexp.new(:const, :Exception), Sexp.new(:lasgn, :e, Sexp.new(:gvar, :$!))),
+  #            Sexp.new(:call, Sexp.new(:const, :Linguify), :exception, Sexp.new(:arglist, Sexp.new(:lvar, :e))))))))
+  #end
+
 
 end
 
