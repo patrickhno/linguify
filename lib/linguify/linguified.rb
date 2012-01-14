@@ -1,6 +1,6 @@
 # encoding: utf-8
 
-# Copyright (c) 2011 Patrick Hanevold.
+# Copyright (c) 2011-2012 Patrick Hanevold.
 #
 # Permission is hereby granted, free of charge, to any person obtaining
 # a copy of this software and associated documentation files (the
@@ -52,7 +52,7 @@ module Linguify
                                              :args     => rule[:match].match(str).to_a[1..-1]
 
         str = Linguified.reduce_string(str,rule[:match],reduction.to_rexp)
-        break if /^{.*}$/ =~ str
+        break if /^{:[0-9]*}$/ =~ str
       end
 
       @encoded = str
@@ -94,9 +94,9 @@ module Linguify
     #
     def self.reduce_string str,match_expression,reduction
       match = match_expression.match(str).to_a
+      needle = match.first
+      splitted = Linguified.informative_split(str,needle)
       if match.size == 1
-        needle = match[0]
-        splitted = Linguified.informative_split(str,needle)
         prev = ' '
         i = -1
         splitted.map! do |split|
@@ -115,9 +115,6 @@ module Linguify
         end
         splitted.join
       else
-        needle = match[0]
-        splitted = Linguified.informative_split(str,needle)
-
         splitted.map{ |split| split.kind_of?(Symbol) ? reduction : split }.join
       end
     end
@@ -149,6 +146,8 @@ module Linguify
     # @returns [ Boolean ] true if so
     #
     def self.has_needle_on_word_boundary? splitted
+      return true if splitted.size == 1 and splitted.first == :needle
+
       splitted.each_with_index do |split,i|
         if split.kind_of? String
           word_bound = i == 0 ? split[-1] == ' ' : split[0] == ' ' || split[-1] == ' '
@@ -167,21 +166,13 @@ module Linguify
         if rule[:match] =~ str
           # ok, it matched, but only alow matches with word boundaries
           match = rule[:match].match(str).to_a
-          if match.size == 1
-            # one match means the search space contains just the needle, so its a perfect match
-            true
-          else
-            # multiple matches, check if the needle is found on word boundaries
-            raise "uh?" unless match.size == 2
-            needle = match[1]
-            Linguified.has_needle_on_word_boundary? Linguified.informative_split(str,needle)
-          end
+          needle = match.first
+          Linguified.has_needle_on_word_boundary? Linguified.informative_split(str,needle)
         else
           false
         end
       end
       raise "no step definition for #{str}" if found.size == 0
-
       found[0]
     end
 

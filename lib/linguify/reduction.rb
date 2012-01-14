@@ -1,6 +1,6 @@
 # encoding: utf-8
 
-# Copyright (c) 2011 Patrick Hanevold.
+# Copyright (c) 2011-2012 Patrick Hanevold.
 #
 # Permission is hereby granted, free of charge, to any person obtaining
 # a copy of this software and associated documentation files (the
@@ -150,7 +150,8 @@ module Linguify
           # got a number argument, stuff it in a integer variable
           args_code << Sexp.new(:lasgn, args[i], Sexp.new(:lit, arg.to_i))
         else
-          raise "hell"
+          # got a string
+          args_code << Sexp.new(:lasgn, args[i], Sexp.new(:str, arg))
         end
       end
 
