@@ -30,7 +30,7 @@ class Sexp < Array
   # @param [ Hash ] named_args The arguments of the code block
   #
   def replace_variable_references! params
-    
+
     replacement = params[:replacement]
     needle      = params[:needle]
     named_args  = params[:named_args] || ''
@@ -41,7 +41,12 @@ class Sexp < Array
     when :lvar
       if self[1] == needle
         unless replacement.inline?
-          self[1]=replacement.sexp
+          if replacement.sexp[0] == :str
+            self[0] = :str
+            self[1]=replacement.sexp[1]
+          else
+            self[1]=replacement.sexp
+          end
         end
       end
     when :call
@@ -99,9 +104,29 @@ class Sexp < Array
     )
   end
 
+  def variable_exists? needle
+    case sexp_type
+    when :lasgn
+      self[1] == needle
+    when :lvar
+      self[1] == needle
+    when :call
+      self[2] == needle
+    when :lvar
+      self[1] == needle
+    else
+      self[1..-1].each do |h|
+        if h && h.kind_of?(Sexp)
+          return true if h.variable_exists?(needle)
+        end
+      end
+      false
+    end
+  end
+
   ##
   ## currently not in use
-  ## 1.9.2 p180 does'nt give us a backtrace from the other side
+  ## 1.9.2 p180 doesn't give us a backtrace from the other side
   ##
   # Envelope a Sexp in the debug envelope
   # which basicly dispatch exceptions into our unitverse

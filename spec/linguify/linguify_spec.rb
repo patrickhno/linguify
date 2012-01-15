@@ -25,6 +25,11 @@ require 'linguify'
 
 describe Linguify::Linguified, "#linguify" do
 
+  before(:each) do
+    Linguify::Reduction.class_variable_set(:@@reductions,[])
+    Linguify.class_variable_set(:@@rules,[])
+  end
+
   it "finds words in sentences" do
     l = Linguify::Linguified
     l.informative_split("I fight for the users","users").should       == ["I fight for the ", :needle]
@@ -46,6 +51,53 @@ describe Linguify::Linguified, "#linguify" do
     l = Linguify::Linguified
     l.reduce_string('I fight for a user with email "user@domain.com"',/user/,"{needle}").should == 'I fight for a {needle} with email "user@domain.com"'
   end
+
+  it "handles multiple arguments of same kind" do
+
+    reduce /word/ => 'a_word' do
+      "word".to_a
+    end
+
+    reduce /a ({a_word:[^}]*}) is a ({a_word:[^}]*})/ do |word_a,word_b|
+      word_a.zip(word_b)
+    end
+
+    "a word is a word".linguify.to_ruby.should == "code = lambda do\n  a_word_0 = \"word\".to_a\n  a_word_1 = \"word\".to_a\n  a_word_0.zip(a_word_1)\nend\n"
+  end
+
+  it "handles aliases" do
+
+    reduce /word/ => 'word' do |word|
+      word
+    end
+
+    reduce /({word:[^}]*})/ => 'alias' do |a|
+      a
+    end
+
+    reduce /({alias:[^}]*})/ do |b|
+      b
+    end
+
+    "word".linguify.to_ruby.should == "code = lambda do\n  word_0 = \"word\"\n  alias_0 = word_0\n  alias_0\nend\n"
+  end
+
+  it "handles this" do
+
+    reduce /user/ => 'model' do |model|
+      model.to_s
+    end
+    reduce /the ({model:[^}]*})/ => 'the_object' do |model|
+      model
+    end
+    reduce /And ({the_object:[^}]*}) is a ([^ ]*) ({model:[^}]*})/ do |mod,type,is|
+      mod.to_a
+      type.to_f
+    end
+
+    "And the user is a real user".linguify.to_ruby.should == "code = lambda do\n  model_0 = \"user\".to_s\n  the_object_0 = model_0\n  model_1 = \"user\".to_s\n  (the_object_0.to_a\n  \"real\".to_f)\nend\n"
+  end
+
 
   it "should reduce multiple rules into ruby code" do
 
@@ -78,7 +130,7 @@ describe Linguify::Linguified, "#linguify" do
       end
     end
 
-    "view all files inside all directories recursively".linguify.to_ruby.should == "code = lambda do\n  directories_0 = Dir.entries(\".\").select { |f| (not (f[0] == \".\")) and File.directory?(f) }\n  directories_1 = (all_dirs = directories_0\n  Find.find(directories_0) do |path|\n    if FileTest.directory?(path) then\n      if (File.basename(path)[0] == \".\") then\n        Find.prune\n      else\n        (all_dirs << path)\n        next\n      end\n    end\n  end\n  all_dirs)\n  files_2 = directories_1.map { |f| File.new(f, \"r\") }\n  files_2.each { |file| pp(file) }\nend\n"
+    "view all files inside all directories recursively".linguify.to_ruby.should == "code = lambda do\n  directories_0 = Dir.entries(\".\").select { |f| (not (f[0] == \".\")) and File.directory?(f) }\n  directories_0 = (all_dirs = directories_0\n  Find.find(directories_0) do |path|\n    if FileTest.directory?(path) then\n      if (File.basename(path)[0] == \".\") then\n        Find.prune\n      else\n        (all_dirs << path)\n        next\n      end\n    end\n  end\n  all_dirs)\n  files_0 = directories_0.map { |f| File.new(f, \"r\") }\n  files_0.each { |file| pp(file) }\nend\n"
   end
 
   it "should mix javascript and ruby" do

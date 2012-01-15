@@ -88,10 +88,10 @@ module Linguify
   end
 
   # currently not in use
-  # 1.9.2 p180 does'nt give us a backtrace from the other side
-  def self.exception e
-    raise e
-  end
+  # 1.9.2 p180 doesn't give us a backtrace from the other side
+  #def self.exception e
+  #  raise e
+  #end
 
 end
 

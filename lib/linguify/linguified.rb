@@ -49,7 +49,7 @@ module Linguify
                                              :lang     => rule[:lang],
                                              :inline   => rule[:inline],
                                              :regexp   => rule[:match].inspect,
-                                             :args     => rule[:match].match(str).to_a[1..-1]
+                                             :args     => rule[:match].match(str).to_a
 
         str = Linguified.reduce_string(str,rule[:match],reduction.to_rexp)
         break if /^{:[0-9]*}$/ =~ str

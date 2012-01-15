@@ -82,7 +82,11 @@ module Linguify
           raise "unsupported argument type #{args}"
         end
       end
-      @named_args = Hash[*args.zip(@args).flatten] if args
+
+      # maybe we can fix the input so we don't have to repair it here?
+      @args = @args[-args.size..-1] if args and args.size != @args.size
+
+      @named_args = Hash[*args.zip(@args[-args.size..-1]).flatten] if args
       @named_args ||= {}
     end
 
@@ -102,6 +106,15 @@ module Linguify
     
     def compile
       compile_with_return_to_var
+    end
+
+    def allocate_variable name,not_in
+      n = 0
+      begin
+        var = "#{name}_#{n}".to_sym
+        n += 1
+      end while not_in.select{ |sexp| sexp.variable_exists?(var) }.size > 0
+      var
     end
 
     # Compile self
@@ -141,9 +154,10 @@ module Linguify
               code = red.compile_with_return_to_var :replace => replace
               replace[args[i]] = Replacement.new(:sexp => Sexp.new(:block,*code), :inline => true)
             else
-              code = red.compile_with_return_to_var :return_variable => "#{ret}_#{n}".to_sym, :replace => replace
+              var = allocate_variable(ret,[*args_code,sexp])
+              code = red.compile_with_return_to_var :return_variable => var, :replace => replace
               args_code += code
-              replace[args[i]] = Replacement.new(:sexp => "#{ret}_#{n}".to_sym)
+              replace[args[i]] = Replacement.new(:sexp => var)
             end
           end
         elsif /^[0-9]+$/ =~ arg
@@ -151,7 +165,7 @@ module Linguify
           args_code << Sexp.new(:lasgn, args[i], Sexp.new(:lit, arg.to_i))
         else
           # got a string
-          args_code << Sexp.new(:lasgn, args[i], Sexp.new(:str, arg))
+          replace[args[i]] = Replacement.new(:sexp => Sexp.new(:str, arg)) if args[i]
         end
       end
 
