@@ -168,6 +168,33 @@ end
 #    "
 ```
 
+There is also the inline keyword:
+
+``` ruby
+require 'linguify'
+
+reduce /inlined code/ => 'code' do
+  something.each do |foobar| # life is not worth living without psedo foobars
+    pp foobar
+  end
+end
+
+reduce /execute ({code:[^}]*})/ do |code|
+  pp "hey mum"
+  inline code
+  code
+  pp "you will never know what I just did"
+end
+
+"execute inlined code".linguify.to_ruby
+# => "code = lambda do
+#       (pp(\"hey mum\")
+#       (something.each { |foobar| pp(foobar) })
+#       pp(\"you will never know what I just did\"))
+#     end
+#    "
+```
+
 ## License
 
 (The MIT License)

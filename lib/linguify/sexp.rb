@@ -145,6 +145,54 @@ class Sexp < Array
   #            Sexp.new(:call, Sexp.new(:const, :Linguify), :exception, Sexp.new(:arglist, Sexp.new(:lvar, :e))))))))
   #end
 
+  def find needle
+    res = []
+    res << self if sexp_type == needle
+    case sexp_type
+    when :lasgn
+      self[1] == needle
+    when :lvar
+      self[1] == needle
+    when :call
+      self[2] == needle
+    when :lvar
+      self[1] == needle
+    else
+      self[1..-1].each do |h|
+        if h && h.kind_of?(Sexp)
+          res += h.find(needle)
+        end
+      end
+    end
+    res
+  end
+
+  def self.inline_keyword_inlined! code
+    inlines = Sexp.from_array(code).find(:call).select{ |call| call[1] == nil && call[2] == :inline }
+    inlines.each do |inline|
+      raise "Im lost, dont know what this is (yet)" unless inline[3].sexp_type == :arglist
+      raise "Im lost, dont know what this is (yet)" unless inline[3].size == 2
+      raise "Im lost, dont know what this is (yet)" unless inline[3][1].sexp_type == :lvar
+      var = inline[3][1][1]
+
+      assignments = []
+      code.each_with_index do |expression,n|
+        if expression.sexp_type == :lasgn and expression[1] == var
+          assignments << n
+        end
+      end
+      raise "this should never happen (yes, really!)" unless assignments.size == 1
+
+      code_block = code[assignments.first]
+      code.delete_at(assignments.first)
+
+      # now inject code
+      inline.clear
+      inline[0] = code_block[0]
+      inline[1] = code_block[1]
+      inline[2] = code_block[2]
+    end
+  end
 
 end
 

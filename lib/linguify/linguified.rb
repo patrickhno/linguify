@@ -42,6 +42,7 @@ module Linguify
       #
       @sentence = str.dup
       @bind = bind
+      @stack = [ str ]
       loop do
         rule = find_rule(str)
 
@@ -52,6 +53,8 @@ module Linguify
                                              :args     => rule[:match].match(str).to_a
 
         str = Linguified.reduce_string(str,rule[:match],reduction.to_rexp)
+        @stack << str
+
         break if /^{:[0-9]*}$/ =~ str
       end
 
@@ -62,6 +65,8 @@ module Linguify
       #
 
       code = Reduction::parse(str).compile
+
+      Sexp.inline_keyword_inlined!(code)
 
       #if @dispatch_exceptions
       #  @sexy = Sexp.debug_envelope(code)
@@ -142,13 +147,20 @@ module Linguify
     def self.has_needle_on_word_boundary? splitted
       return true if splitted.size == 1 and splitted.first == :needle
 
+      prev_ends_with_space = true
+      following_needle     = true
+
       splitted.each_with_index do |split,i|
         if split.kind_of? String
-          word_bound = i == 0 ? split[-1] == ' ' : split[0] == ' ' || split[-1] == ' '
-          return true if word_bound
+          return true if following_needle and prev_ends_with_space and split[0] == ' '
+
+          prev_ends_with_space = (split[-1] == ' ')
+          following_needle = false
+        else # :needle
+          following_needle = true
         end
       end
-      false
+      following_needle && prev_ends_with_space
     end
 
     # Find a reduction rule for the string
@@ -166,7 +178,10 @@ module Linguify
           false
         end
       end
-      raise "no step definition for #{str}" if found.size == 0
+      if found.size == 0
+        pp @stack
+        raise "no step definition for #{str}"
+      end
       found[0]
     end
 
