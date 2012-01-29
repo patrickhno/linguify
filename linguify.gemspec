@@ -5,11 +5,11 @@
 
 Gem::Specification.new do |s|
   s.name = "linguify"
-  s.version = "0.5.2"
+  s.version = "0.6.0"
 
   s.required_rubygems_version = Gem::Requirement.new(">= 0") if s.respond_to? :required_rubygems_version=
   s.authors = ["Patrick Hanevold"]
-  s.date = "2012-01-15"
+  s.date = "2012-01-29"
   s.description = "Linguify is a linguistic compiler allowing you to compile and execute plain english."
   s.email = "patrick.hanevold@gmail.com"
   s.extra_rdoc_files = [
@@ -35,7 +35,7 @@ Gem::Specification.new do |s|
   s.homepage = "http://github.com/patrickhno/linguify"
   s.licenses = ["MIT"]
   s.require_paths = ["lib"]
-  s.rubygems_version = "1.8.11"
+  s.rubygems_version = "1.8.15"
   s.summary = "Linguify, the linguistic compiler."
 
   if s.respond_to? :specification_version then
